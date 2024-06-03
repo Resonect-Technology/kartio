@@ -25,3 +25,13 @@
 # Development
 
 - Secrets are only stored in `.env.local`.
+
+# Security
+
+## Forms
+
+Using Symfony's Form Builder offers several advantages, including better separation of concerns by decoupling form logic from business logic, automatic validation integration ensuring data integrity, ease of form creation and management with a fluent interface, built-in security features like CSRF protection, seamless Twig integration for rendering and customizing form layouts, support for localization and translation, the ability to handle complex and dynamic forms, and extensibility through custom form types and events. These features collectively enhance the maintainability, reusability, and robustness of form handling in Symfony applications.
+
+## SQL Injection
+
+Doctrine ODM takes care of preventing injection attacks in MongoDB by using parameterized queries and escaping data, ensuring that user inputs are never directly interpolated into query strings. It abstracts the complexities of database interactions, making it easier for developers to write secure code. Additionally, when used with Symfony's validation and form handling components, it ensures that only sanitized and validated data is persisted, providing robust protection against injection and other security vulnerabilities.
