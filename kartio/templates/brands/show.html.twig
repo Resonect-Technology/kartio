@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends "base.html.twig" %}
 
 {% block title %}
 	{{ brand.name }}
@@ -8,25 +8,35 @@
 	<div class="bg-white shadow-md rounded-lg p-6">
 		<h1 class="text-3xl font-bold mb-4">{{ brand.name }}</h1>
 		<p class="mb-6">
-			Here are the details for the brand "{{ brand.name }}". You can view and manage the loyalty cards associated with this brand.
+			Zde nalezente přehled karty vydaných značkou "{{ brand.name }}".
 		</p>
 		<div class="flex justify-end mb-4">
-			<a href="{{ path('app_brands') }}" class="btn btn-secondary">Back to Brands</a>
+			<a href="{{ path('app_brands') }}" class="btn btn-primary">Zpět na Značky</a>
 		</div>
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			{% for card in brand.loyaltyCards %}
-				<div class="card bg-green-50 border border-green-200 rounded-lg p-4">
-					<div class="card-body">
-						<h2 class="card-title">{{ card.customerName }}</h2>
-						<p class="mb-2">Card Number:
-							{{ card.cardNumber }}</p>
-						<p class="mb-4">Expiry Date:
-							{{ card.expiryDate|date('Y-m-d') }}</p>
-					</div>
-				</div>
-			{% else %}
-				<p>No loyalty cards found.</p>
-			{% endfor %}
+
+		<div class="overflow-x-auto">
+			<table class="table">
+				<thead>
+					<tr>
+						<th></th>
+						<th>Jméno</th>
+						<th>Identifikátor karty</th>
+					</tr>
+				</thead>
+				<tbody>
+
+					{% for card in brand.loyaltyCards %}
+						<tr class="hover">
+							<th>{{ loop.index }}</th>
+							<td>{{ card.customerName }}</td>
+							<td>{{ card.cardIdentifier }}</td>
+						</tr>
+					{% else %}
+						<p>Nebyly nalezeny žádné karty.</p>
+					{% endfor %}
+				</tbody>
+			</table>
 		</div>
+
 	</div>
 {% endblock %}

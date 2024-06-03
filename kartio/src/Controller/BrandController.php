@@ -31,7 +31,7 @@ class BrandController extends AbstractController
             throw $this->createNotFoundException("Brand not found!");
         }
 
-        return $this->render("brands/brand.html.twig", [
+        return $this->render("brands/show.html.twig", [
             "brand" => $brand,
         ]);
     }
