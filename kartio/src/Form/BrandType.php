@@ -15,8 +15,7 @@ class BrandType extends AbstractType
     {
         $builder
             ->add("name", TextType::class, [
-                "label" => "Brand name",
-                "attr" => ["class" => "input input-bordered w-full"]
+                "label" => "Název značky",
             ]);
     }
 
