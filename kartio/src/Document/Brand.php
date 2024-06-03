@@ -51,4 +51,9 @@ class Brand
     {
         $this->loyaltyCards->add($loyaltyCard);
     }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
 }

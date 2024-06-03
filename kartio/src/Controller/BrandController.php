@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Document\Brand;
 use App\Document\LoyaltyCard;
+use App\Form\BrandType;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -22,7 +24,7 @@ class BrandController extends AbstractController
         ]);
     }
 
-    #[Route("/{id}", name: "app_brand")]
+    #[Route("/brand/{id}", name: "app_brand")]
     public function brand(DocumentManager $dm, string $id): Response
     {
         $brand = $dm->getRepository(Brand::class)->find($id);
@@ -37,7 +39,7 @@ class BrandController extends AbstractController
     }
 
 
-    #[Route("/create", name: "app_create_brand")]
+    #[Route("/create-test", name: "app_create_test")]
     public function createBrand(DocumentManager $dm): Response
     {
         $brand = new Brand("Kartio");
@@ -53,5 +55,25 @@ class BrandController extends AbstractController
         $dm->flush();
 
         return new Response("Brand created!");
+    }
+
+    #[Route("/new", name: "app_new_brand")]
+    public function newBrand(Request $request, DocumentManager $dm): Response
+    {
+        $brand = new Brand("");
+
+        $form = $this->createForm(BrandType::class, $brand);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $dm->persist($brand);
+            $dm->flush();
+
+            return $this->redirectToRoute("app_brands");
+        }
+
+        return $this->render("brands/new.html.twig", [
+            "form" => $form->createView(),
+        ]);
     }
 }
