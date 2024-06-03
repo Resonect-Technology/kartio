@@ -5,7 +5,6 @@ namespace App\Document;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Doctrine\ODM\MongoDB\Types\Type;
 
@@ -15,23 +14,41 @@ use Doctrine\ODM\MongoDB\Types\Type;
     This class represents business owners' brands.
 */
 
-#[MongoDB\Document(collection: "brands")]
+#[ODM\Document()]
 class Brand
 {
     #[ODM\Id()]
-    public $id;
+    private $id;
 
     #[ODM\Field(type: Type::STRING)]
-    public string $name;
+    private string $name;
 
-    #[ODM\Field(type: Type::STRING)]
-    public string $slug;
+    #[ODM\EmbedMany(targetDocument: LoyaltyCard::class)]
+    private Collection $loyaltyCards;
 
-    #[ODM\EmbedMany(targetDocument: Availability::class)]
-    public Collection $managers;
-
-    public function __construct()
+    public function __construct(string $name)
     {
-        $this->managers = new ArrayCollection();
+        $this->name = $name;
+        $this->loyaltyCards = new ArrayCollection();
+    }
+
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getLoyaltyCards(): Collection
+    {
+        return $this->loyaltyCards;
+    }
+
+    public function addLoyaltyCard(LoyaltyCard $loyaltyCard): void
+    {
+        $this->loyaltyCards->add($loyaltyCard);
     }
 }

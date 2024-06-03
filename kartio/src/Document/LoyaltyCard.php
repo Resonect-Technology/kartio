@@ -5,6 +5,7 @@ namespace App\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Doctrine\ODM\MongoDB\Types\Type;
 
+#[ODM\EmbeddedDocument()]
 class LoyaltyCard
 {
     #[ODM\Field(type: Type::STRING)]
