@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class RegistrationType extends AbstractType
 {
@@ -17,11 +18,19 @@ class RegistrationType extends AbstractType
         $builder
             ->add("email", EmailType::class, [
                 "label" => "Email",
-                "attr" => ["class" => "grow"]
+                "attr" => ["class" => "grow"],
+                "constraints" => [
+                    new Assert\NotBlank(),
+                    new Assert\Email(),
+                ],
             ])
             ->add("password", PasswordType::class, [
-                "label" => "Password",
-                "attr" => ["class" => "grow"]
+                "label" => "Heslo",
+                "attr" => ["class" => "grow"],
+                "constraints" => [
+                    new Assert\NotBlank(),
+                    new Assert\Length(["min" => 10]),
+                ],
             ])
             ->add("role", ChoiceType::class, [
                 "label" => "Role pro registraci",

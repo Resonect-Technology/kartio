@@ -4,21 +4,31 @@ namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Doctrine\ODM\MongoDB\Types\Type;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ODM\EmbeddedDocument()]
 class LoyaltyCard
 {
     #[ODM\Field(type: Type::STRING)]
+    #[Assert\NotBlank]
     private string $customerName;
 
     #[ODM\Field(type: Type::STRING)]
-    private ?string $email = null;
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    private string $email;
 
     #[ODM\Field(type: Type::STRING)]
+    #[Assert\NotBlank]
+    #[Assert\Regex(
+        pattern: "/^\+?[0-9]{7,15}$/",
+        message: "Neplatné telefonní číslo."
+    )]
+    private string $phoneNumber;
+
+    #[ODM\Field(type: Type::STRING)]
+    #[Assert\NotBlank]
     private string $cardIdentifier;
-
-    #[ODM\Field(type: Type::STRING)]
-    private ?string $phoneNumber = null;
 
     #[ODM\ReferenceOne(targetDocument: Brand::class)]
     private ?Brand $brand = null;

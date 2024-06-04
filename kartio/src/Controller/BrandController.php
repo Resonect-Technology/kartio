@@ -14,12 +14,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\ConstraintViolation;
 
 #[Route("/brands")]
 #[IsGranted("ROLE_ADMIN")]
 class BrandController extends AbstractController
 {
-    #[Route("", name: "app_brands")]
+    #[Route("", name: "app_brands", methods: ["GET"])]
     public function brands(DocumentManager $dm, UserInterface $user): Response
     {
         $brands = $dm->getRepository(Brand::class)->findAll();
@@ -46,7 +47,7 @@ class BrandController extends AbstractController
         ]);
     }
 
-    #[Route("/brand/{id}", name: "app_brand")]
+    #[Route("/brand/{id}", name: "app_brand", methods: ["GET"])]
     public function brand(DocumentManager $dm, string $id, UserInterface $user): Response
     {
         $brand = $dm->getRepository(Brand::class)->find($id);
@@ -64,21 +65,31 @@ class BrandController extends AbstractController
         ]);
     }
 
-    #[Route("/new", name: "app_new_brand")]
+    #[Route("/new", name: "app_new_brand", methods: ["GET", "POST"])]
     public function newBrand(Request $request, DocumentManager $dm, UserInterface $user): Response
     {
         $brand = new Brand("");
         $form = $this->createForm(BrandType::class, $brand);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $brand->setName($form->get("name")->getData());
-            $brand->addUser($user); // Associate the brand with the current user
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $brand->setName($form->get("name")->getData());
+                $brand->addUser($user); // Associate the brand with the current user
 
-            $dm->persist($brand);
-            $dm->flush();
+                $dm->persist($brand);
+                $dm->flush();
 
-            return $this->redirectToRoute("app_brands");
+                $this->addFlash("success", "Brand created successfully.");
+                return $this->redirectToRoute("app_brands");
+            } else {
+                // Collect validation errors
+                $errors = $form->getErrors(true, true);
+                /** @var ConstraintViolation $error */
+                foreach ($errors as $error) {
+                    $this->addFlash("error", $error->getMessage());
+                }
+            }
         }
 
         return $this->render("brands/new.html.twig", [
@@ -94,17 +105,26 @@ class BrandController extends AbstractController
         $form = $this->createForm(LoyaltyCardType::class, $loyaltyCard);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $loyaltyCard->setBrand($brand); // Set the brand for the loyalty card
-                $brand->addLoyaltyCard($loyaltyCard);
-                $dm->flush();
-                $this->addFlash("success", "Loyalty card added successfully.");
-            } catch (\Exception $e) {
-                $this->addFlash("error", $e->getMessage());
-            }
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                try {
+                    $loyaltyCard->setBrand($brand); // Set the brand for the loyalty card
+                    $brand->addLoyaltyCard($loyaltyCard);
+                    $dm->flush();
+                    $this->addFlash("success", "Karta byla přidána.");
+                } catch (\Exception $e) {
+                    $this->addFlash("error", $e->getMessage());
+                }
 
-            return $this->redirectToRoute("app_brand", ["id" => $brand->getId()]);
+                return $this->redirectToRoute("app_brand", ["id" => $brand->getId()]);
+            } else {
+                // Collect validation errors
+                $errors = $form->getErrors(true, true);
+                /** @var ConstraintViolation $error */
+                foreach ($errors as $error) {
+                    $this->addFlash("error", $error->getMessage());
+                }
+            }
         }
 
         return $this->render("brands/add_card.html.twig", [
@@ -121,7 +141,7 @@ class BrandController extends AbstractController
         try {
             $brand->removeLoyaltyCard($email);
             $dm->flush();
-            $this->addFlash("success", "Loyalty card removed successfully.");
+            $this->addFlash("success", "Karta byla odebrána.");
         } catch (\Exception $e) {
             $this->addFlash("error", $e->getMessage());
         }
@@ -140,12 +160,12 @@ class BrandController extends AbstractController
                 if (!$brand->getUsers()->contains($invitee)) {
                     $brand->addUser($invitee);
                     $dm->flush();
-                    $this->addFlash("success", "User invited successfully.");
+                    $this->addFlash("success", "Uživatel byl pozván.");
                 } else {
-                    $this->addFlash("error", "User already has access.");
+                    $this->addFlash("error", "Uživatel již má přístup.");
                 }
             } else {
-                $this->addFlash("error", "User not found.");
+                $this->addFlash("error", "Uživatel nebyl nalezen.");
             }
 
             return $this->redirectToRoute("app_brand_invite", ["id" => $brand->getId()]);

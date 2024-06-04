@@ -47,7 +47,7 @@ class Brand
     {
         foreach ($this->loyaltyCards as $card) {
             if ($card->getEmail() === $loyaltyCard->getEmail()) {
-                throw new \Exception('A card for this email already exists.');
+                throw new \Exception("Karta s tímto emailem již existuje.");
             }
         }
         $loyaltyCard->setBrand($this);

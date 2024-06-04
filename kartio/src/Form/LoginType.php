@@ -16,9 +16,9 @@ class LoginType extends AbstractType
                 "label" => "Email",
                 "attr" => ["class" => "grow"]
             ])
-            ->add('password', PasswordType::class, [
-                'label' => 'Password',
-                'attr' => ['class' => 'grow']
+            ->add("password", PasswordType::class, [
+                "label" => "Heslo",
+                "attr" => ["class" => "grow"]
             ]);
     }
 }

@@ -13,7 +13,7 @@
 
 				{% for field in form %}
 
-					{% if field.vars.name != '_token' %}
+					{% if field.vars.name != "_token" %}
 						<label class="input input-bordered flex input-accent items-center gap-2 mb-2">
 							{{ form_label(field) }}
 							{{ form_widget(field) }}

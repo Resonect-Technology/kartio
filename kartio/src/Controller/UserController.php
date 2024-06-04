@@ -6,13 +6,10 @@ use App\Document\Brand;
 use App\Document\User;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security as SecurityBundleSecurity;
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route("/customer")]
@@ -34,21 +31,21 @@ class UserController extends AbstractController
         $user = $security->getUser();
 
         if (!$user instanceof User) {
-            throw new \LogicException('Logged in user is not of expected type.');
+            throw new \LogicException("Přihlášený uživatel nemá platný formát.");
         }
 
         $email = $user->getEmail(); // This gets the email
-        $this->logger->info('User email: ' . $email);
+        $this->logger->info("User email: " . $email);
 
         $brands = $dm->getRepository(Brand::class)->findAll();
         $loyaltyCards = [];
 
         foreach ($brands as $brand) {
-            $this->logger->info('Processing brand: ' . $brand->getName());
+            $this->logger->info("Processing brand: " . $brand->getName());
             foreach ($brand->getLoyaltyCards() as $card) {
-                $this->logger->info('Checking card with email: ' . $card->getEmail());
+                $this->logger->info("Checking card with email: " . $card->getEmail());
                 if ($card->getEmail() === $email) {
-                    $this->logger->info('Found matching card for user');
+                    $this->logger->info("Found matching card for user");
                     $loyaltyCards[] = $card;
                 }
             }

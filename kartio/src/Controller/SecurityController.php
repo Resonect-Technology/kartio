@@ -14,7 +14,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    #[Route("/register", name: "app_register")]
+    #[Route("/register", name: "app_register", methods: ["GET", "POST"])]
     public function register(Request $request, DocumentManager $dm, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
@@ -28,11 +28,11 @@ class SecurityController extends AbstractController
             $user->setPassword($hashedPassword);
 
             // Ensure email is set from form data
-            $email = $form->get('email')->getData();
+            $email = $form->get("email")->getData();
             $user->setEmail($email);
 
             // Assign roles based on the select value
-            $role = $form->get('role')->getData();
+            $role = $form->get("role")->getData();
             $user->setRoles([$role]);
 
             // Persist the user to the database
@@ -40,34 +40,34 @@ class SecurityController extends AbstractController
             $dm->flush();
 
             // Add a flash message for successful registration
-            $this->addFlash('success', 'Registration successful! You can now log in.');
+            $this->addFlash("success", "Registrace byla úspěšná.");
 
             // Redirect to the login page
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute("app_login");
         }
 
-        return $this->render('security/register.html.twig', [
-            'form' => $form->createView(),
+        return $this->render("security/register.html.twig", [
+            "form" => $form->createView(),
         ]);
     }
 
-    #[Route("/login", name: "app_login")]
+    #[Route("/login", name: "app_login", methods: ["GET", "POST"])]
     public function login(AuthenticationUtils $authUtils): Response
     {
         $error = $authUtils->getLastAuthenticationError();
         $lastUsername = $authUtils->getLastUsername();
 
         if ($error) {
-            $this->addFlash('error', 'Login failed. Please check your credentials and try again.');
+            $this->addFlash("error", "Přihlášení selhalo, prosím zkuste to znovu.");
         }
 
-        return $this->render('security/login.html.twig', [
-            'last_username' => $lastUsername,
-            'error' => $error,
+        return $this->render("security/login.html.twig", [
+            "last_username" => $lastUsername,
+            "error" => $error,
         ]);
     }
 
-    #[Route("/logout", name: "app_logout")]
+    #[Route("/logout", name: "app_logout", methods: ["GET", "POST"])]
     public function logout(): void
     {
         throw new \Exception("This should never be reached!");

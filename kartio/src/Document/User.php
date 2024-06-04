@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ODM\Document(collection: "users")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -15,10 +16,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $id;
 
     #[ODM\Field(type: "string")]
-    private $email;
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    private string $email;
 
     #[ODM\Field(type: "string")]
-    private $password;
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 10, max: 200)]
+    private string $password;
 
     #[ODM\Field(type: "collection")]
     private $roles = [];
