@@ -8,6 +8,8 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "doctrine/mongodb-odm-bundle": "^5.0",
+        "knpuniversity/oauth2-client-bundle": "^2.18",
+        "league/oauth2-github": "^3.1",
         "mongodb/mongodb": "^1.17",
         "symfony/asset": "7.1.*",
         "symfony/asset-mapper": "7.1.*",
@@ -18,9 +20,11 @@
         "symfony/framework-bundle": "7.1.*",
         "symfony/monolog-bundle": "^3.0",
         "symfony/runtime": "7.1.*",
+        "symfony/security-bundle": "7.1.*",
         "symfony/twig-bundle": "7.1.*",
         "symfony/yaml": "7.1.*",
         "symfonycasts/tailwind-bundle": "^0.5.3",
+        "symfonycasts/verify-email-bundle": "^1.17",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"
     },
@@ -76,6 +80,7 @@
     },
     "require-dev": {
         "symfony/debug-bundle": "7.1.*",
+        "symfony/maker-bundle": "^1.59",
         "symfony/stopwatch": "7.1.*",
         "symfony/web-profiler-bundle": "7.1.*"
     }
