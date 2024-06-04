@@ -2,7 +2,10 @@
 
 namespace App\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use PhpParser\ErrorHandler\Collecting;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -20,6 +23,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ODM\Field(type: "collection")]
     private $roles = [];
+
+    #[ODM\ReferenceMany(targetDocument: Brand::class, mappedBy: "users")]
+    private Collection $brands;
+
+    public function __construct()
+    {
+        $this->brands = new ArrayCollection();
+    }
 
     public function getId(): ?string
     {
@@ -93,5 +104,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getBrands(): Collection
+    {
+        return $this->brands;
+    }
+
+    public function addBrand(Brand $brand): self
+    {
+        if (!$this->brands->contains($brand)) {
+            $this->brands->add($brand);
+        }
+        return $this;
+    }
+
+    public function removeBrand(Brand $brand): self
+    {
+        $this->brands->removeElement($brand);
+        return $this;
     }
 }

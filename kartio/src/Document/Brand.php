@@ -26,10 +26,14 @@ class Brand
     #[ODM\EmbedMany(targetDocument: LoyaltyCard::class)]
     private Collection $loyaltyCards;
 
+    #[ODM\ReferenceMany(targetDocument: User::class, inversedBy: "brands")]
+    private Collection $users;
+
     public function __construct(string $name)
     {
         $this->name = $name;
         $this->loyaltyCards = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -55,5 +59,24 @@ class Brand
     public function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+        }
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        $this->users->removeElement($user);
+        return $this;
     }
 }
