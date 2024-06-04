@@ -19,9 +19,20 @@
 			<div class="container mx-auto flex justify-between items-center">
 				<a href="" class="btn btn-ghost normal-case text-xl">Kartio</a>
 				<div>
-					<a href="{{ path('app_brands') }}" class="btn btn-ghost btn-sm rounded-btn">Značky</a>
-					<a href="" class="btn btn-ghost btn-sm rounded-btn">Loyalty Cards</a>
-					<a href="" class="btn btn-ghost btn-sm rounded-btn">Customers</a>
+					{% if is_granted("ROLE_ADMIN") %}
+						<a href="{{ path('app_brands') }}" class="btn btn-ghost btn-sm rounded-btn">Značky</a>
+					{% endif %}
+
+					{% if is_granted("ROLE_USER") %}
+						<a href="" class="btn btn-ghost btn-sm rounded-btn">Loyalty Cards</a>
+					{% endif %}
+
+					{% if is_granted("IS_AUTHENTICATED_FULLY") %}
+						<a href="{{ path('app_logout') }}" class="btn btn-ghost btn-sm rounded-btn">Odhlásit se</a>
+					{% else %}
+						<a href="{{ path('app_login') }}" class="btn btn-ghost btn-sm rounded-btn">Přihlásit se</a>
+					{% endif %}
+
 				</div>
 			</div>
 		</nav>
@@ -36,3 +47,4 @@
 			</footer>
 		</body>
 	</html>
+</body></html>
