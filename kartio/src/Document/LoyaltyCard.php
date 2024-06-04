@@ -12,13 +12,16 @@ class LoyaltyCard
     private string $customerName;
 
     #[ODM\Field(type: Type::STRING)]
-    private string $email;
+    private ?string $email = null;
 
     #[ODM\Field(type: Type::STRING)]
     private string $cardIdentifier;
 
     #[ODM\Field(type: Type::STRING)]
-    private string $phoneNumber;
+    private ?string $phoneNumber = null;
+
+    #[ODM\ReferenceOne(targetDocument: Brand::class)]
+    private ?Brand $brand = null;
 
     public function __construct(string $customerName, string $email, string $phoneNumber, string $cardIdentifier)
     {
@@ -38,12 +41,12 @@ class LoyaltyCard
         return $this->cardIdentifier;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function getPhoneNumber(): string
+    public function getPhoneNumber(): ?string
     {
         return $this->phoneNumber;
     }
@@ -66,5 +69,15 @@ class LoyaltyCard
     public function setPhoneNumber(string $phoneNumber): void
     {
         $this->phoneNumber = $phoneNumber;
+    }
+
+    public function getBrand(): ?Brand
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(Brand $brand): void
+    {
+        $this->brand = $brand;
     }
 }

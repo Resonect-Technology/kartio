@@ -64,25 +64,6 @@ class BrandController extends AbstractController
         ]);
     }
 
-
-    #[Route("/create-test", name: "app_create_test")]
-    public function createBrand(DocumentManager $dm): Response
-    {
-        $brand = new Brand("Kartio");
-
-        $loyaltyCard1 = new LoyaltyCard("Test Testovič", "1234");
-        $loyaltyCard2 = new LoyaltyCard("Kuba David", "5678");
-
-        $brand->addLoyaltyCard($loyaltyCard1);
-        $brand->addLoyaltyCard($loyaltyCard2);
-
-        # Persist the brand and flush which will actually save it to the database.
-        $dm->persist($brand);
-        $dm->flush();
-
-        return new Response("Brand created!");
-    }
-
     #[Route("/new", name: "app_new_brand")]
     public function newBrand(Request $request, DocumentManager $dm, UserInterface $user): Response
     {
@@ -115,6 +96,7 @@ class BrandController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                $loyaltyCard->setBrand($brand); // Set the brand for the loyalty card
                 $brand->addLoyaltyCard($loyaltyCard);
                 $dm->flush();
                 $this->addFlash("success", "Loyalty card added successfully.");

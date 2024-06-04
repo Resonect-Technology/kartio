@@ -2,17 +2,9 @@
 
 namespace App\Document;
 
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Doctrine\ODM\MongoDB\Types\Type;
-
-/*
-    Brand
-    
-    This class represents business owners' brands.
-*/
 
 #[ODM\Document()]
 class Brand
@@ -20,7 +12,7 @@ class Brand
     #[ODM\Id()]
     private $id;
 
-    #[ODM\Field(type: Type::STRING)]
+    #[ODM\Field(type: "string")]
     private string $name;
 
     #[ODM\EmbedMany(targetDocument: LoyaltyCard::class)]
@@ -58,6 +50,7 @@ class Brand
                 throw new \Exception('A card for this email already exists.');
             }
         }
+        $loyaltyCard->setBrand($this);
         $this->loyaltyCards->add($loyaltyCard);
     }
 

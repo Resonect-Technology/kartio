@@ -23,22 +23,31 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Hash the password
             $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
-
             $user->setPassword($hashedPassword);
 
+            // Ensure email is set from form data
+            $email = $form->get('email')->getData();
+            $user->setEmail($email);
+
             // Assign roles based on the select value
-            $role = $form->get("role")->getData();
+            $role = $form->get('role')->getData();
             $user->setRoles([$role]);
 
+            // Persist the user to the database
             $dm->persist($user);
             $dm->flush();
 
-            return $this->redirectToRoute("app_login");
+            // Add a flash message for successful registration
+            $this->addFlash('success', 'Registration successful! You can now log in.');
+
+            // Redirect to the login page
+            return $this->redirectToRoute('app_login');
         }
 
-        return $this->render("security/register.html.twig", [
-            "form" => $form->createView(),
+        return $this->render('security/register.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 
@@ -46,12 +55,15 @@ class SecurityController extends AbstractController
     public function login(AuthenticationUtils $authUtils): Response
     {
         $error = $authUtils->getLastAuthenticationError();
-
         $lastUsername = $authUtils->getLastUsername();
 
-        return $this->render("security/login.html.twig", [
-            "last_username" => $lastUsername,
-            "error" => $error,
+        if ($error) {
+            $this->addFlash('error', 'Login failed. Please check your credentials and try again.');
+        }
+
+        return $this->render('security/login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error,
         ]);
     }
 
