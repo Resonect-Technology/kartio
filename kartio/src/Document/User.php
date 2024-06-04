@@ -115,13 +115,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->brands->contains($brand)) {
             $this->brands->add($brand);
+            $brand->addUser($this);
         }
         return $this;
     }
 
     public function removeBrand(Brand $brand): self
     {
-        $this->brands->removeElement($brand);
+        if ($this->brands->removeElement($brand)) {
+            $brand->removeUser($this);
+        }
         return $this;
     }
 }

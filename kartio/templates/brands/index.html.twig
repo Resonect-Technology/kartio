@@ -22,7 +22,7 @@
 							{{ brand.loyaltyCards|length }}</p>
 						<p class="mb-6">
 							Počet administrátorů:
-							{{ brandsAdminCount[brand.id]+1 }}
+							{{ brandsAdminCount[brand.id] }}
 						</p>
 						<div class="card-actions justify-end">
 							<a href="{{ path('app_brand', {'id': brand.id}) }}">

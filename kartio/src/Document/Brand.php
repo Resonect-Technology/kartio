@@ -70,13 +70,16 @@ class Brand
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
+            $user->addBrand($this);
         }
         return $this;
     }
 
     public function removeUser(User $user): self
     {
-        $this->users->removeElement($user);
+        if ($this->users->removeElement($user)) {
+            $user->removeBrand($this);
+        }
         return $this;
     }
 }
