@@ -12,11 +12,19 @@ class LoyaltyCard
     private string $customerName;
 
     #[ODM\Field(type: Type::STRING)]
+    private string $email;
+
+    #[ODM\Field(type: Type::STRING)]
     private string $cardIdentifier;
 
-    public function __construct(string $customerName, string $cardIdentifier)
+    #[ODM\Field(type: Type::STRING)]
+    private string $phoneNumber;
+
+    public function __construct(string $customerName, string $email, string $phoneNumber, string $cardIdentifier)
     {
         $this->customerName = $customerName;
+        $this->email = $email;
+        $this->phoneNumber = $phoneNumber;
         $this->cardIdentifier = $cardIdentifier;
     }
 
@@ -28,5 +36,35 @@ class LoyaltyCard
     public function getCardIdentifier(): string
     {
         return $this->cardIdentifier;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getPhoneNumber(): string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setCustomerName(string $customerName): void
+    {
+        $this->customerName = $customerName;
+    }
+
+    public function setCardIdentifier(string $cardIdentifier): void
+    {
+        $this->cardIdentifier = $cardIdentifier;
+    }
+
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function setPhoneNumber(string $phoneNumber): void
+    {
+        $this->phoneNumber = $phoneNumber;
     }
 }

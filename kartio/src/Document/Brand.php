@@ -53,7 +53,22 @@ class Brand
 
     public function addLoyaltyCard(LoyaltyCard $loyaltyCard): void
     {
+        foreach ($this->loyaltyCards as $card) {
+            if ($card->getEmail() === $loyaltyCard->getEmail()) {
+                throw new \Exception('A card for this email already exists.');
+            }
+        }
         $this->loyaltyCards->add($loyaltyCard);
+    }
+
+    public function removeLoyaltyCard(string $email): void
+    {
+        foreach ($this->loyaltyCards as $key => $card) {
+            if ($card->getEmail() === $email) {
+                $this->loyaltyCards->remove($key);
+                break;
+            }
+        }
     }
 
     public function setName(string $name): void

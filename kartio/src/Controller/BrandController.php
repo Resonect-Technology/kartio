@@ -6,6 +6,7 @@ use App\Document\Brand;
 use App\Document\LoyaltyCard;
 use App\Document\User;
 use App\Form\BrandType;
+use App\Form\LoyaltyCardType;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -102,6 +103,48 @@ class BrandController extends AbstractController
         return $this->render("brands/new.html.twig", [
             "form" => $form->createView(),
         ]);
+    }
+
+    #[Route("/brand/{id}/add-card", name: "app_add_card", methods: ["GET", "POST"])]
+    public function addLoyaltyCard(Brand $brand, Request $request, DocumentManager $dm): Response
+    {
+        $loyaltyCard = new LoyaltyCard("", "", "", "");
+
+        $form = $this->createForm(LoyaltyCardType::class, $loyaltyCard);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $brand->addLoyaltyCard($loyaltyCard);
+                $dm->flush();
+                $this->addFlash("success", "Loyalty card added successfully.");
+            } catch (\Exception $e) {
+                $this->addFlash("error", $e->getMessage());
+            }
+
+            return $this->redirectToRoute("app_brand", ["id" => $brand->getId()]);
+        }
+
+        return $this->render("brands/add_card.html.twig", [
+            "form" => $form->createView(),
+            "brand" => $brand,
+        ]);
+    }
+
+    #[Route("/brand/{id}/remove-card", name: "app_remove_card", methods: ["POST"])]
+    public function removeLoyaltyCard(Brand $brand, Request $request, DocumentManager $dm): Response
+    {
+        $email = $request->request->get("email");
+
+        try {
+            $brand->removeLoyaltyCard($email);
+            $dm->flush();
+            $this->addFlash("success", "Loyalty card removed successfully.");
+        } catch (\Exception $e) {
+            $this->addFlash("error", $e->getMessage());
+        }
+
+        return $this->redirectToRoute("app_brand", ["id" => $brand->getId()]);
     }
 
     #[Route("/brand/{id}/invite", name: "app_brand_invite", methods: ["GET", "POST"])]
