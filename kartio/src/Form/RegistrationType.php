@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Document\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -21,6 +22,16 @@ class RegistrationType extends AbstractType
             ->add("password", PasswordType::class, [
                 "label" => "Password",
                 "attr" => ["class" => "grow"]
+            ])
+            ->add("role", ChoiceType::class, [
+                "label" => "Role pro registraci",
+                "choices" => [
+                    "Zákazník" => "ROLE_USER",
+                    "Obchodník" => "ROLE_ADMIN",
+                ],
+                "expanded" => false,
+                "multiple" => false,
+                "mapped" => false, // This field is not mapped to the User entity
             ]);
     }
 

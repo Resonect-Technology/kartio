@@ -11,7 +11,7 @@
 			Prosím zaregistrujte se.
 		</p>
 		<div class="flex justify-end mb-4">
-			<a href="{{ path('app_brands') }}" class="btn btn-primary">Zpět na Úvod</a>
+			<a href="{{ path("app_brands") }}" class="btn btn-primary">Zpět na Úvod</a>
 		</div>
 
 		<div class="mb-4 lg:w-96">
@@ -28,7 +28,14 @@
 				{{ form_errors(form.password) }}
 			</label>
 
-			<button type="submit" class="btn btn-primary">Register</button>
+			<label class="form-control w-full max-w-xs mb-5">
+				<div class="label">
+					<span class="label-text">{{ form_label(form.role) }}</span>
+				</div>
+				{{ form_widget(form.role, {"attr": {"class": "select select-bordered"}}) }}
+			</label>
+
+			<button type="submit" class="btn btn-primary">Registrovat</button>
 			{{ form_end(form) }}
 
 		</div>

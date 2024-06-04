@@ -27,6 +27,10 @@ class SecurityController extends AbstractController
 
             $user->setPassword($hashedPassword);
 
+            // Assign roles based on the select value
+            $role = $form->get("role")->getData();
+            $user->setRoles([$role]);
+
             $dm->persist($user);
             $dm->flush();
 
