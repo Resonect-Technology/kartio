@@ -1,0 +1,11 @@
+hwi_oauth:
+  # https://github.com/hwi/HWIOAuthBundle/blob/master/docs/2-configuring_resource_owners.md
+  firewall_name: main
+  resource_owners:
+    github:
+      type: github
+      client_id: "%env(OAUTH_GITHUB_CLIENT_ID)%"
+      client_secret: "%env(OAUTH_GITHUB_CLIENT_SECRET)%"
+      scope: "user:email"
+      options:
+        display: popup

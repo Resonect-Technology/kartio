@@ -8,6 +8,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "doctrine/mongodb-odm-bundle": "^5.0",
+        "hwi/oauth-bundle": "^2.2",
         "mongodb/mongodb": "^1.17",
         "symfony/asset": "7.1.*",
         "symfony/asset-mapper": "7.1.*",
