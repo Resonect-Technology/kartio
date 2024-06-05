@@ -7,6 +7,8 @@
 
 **Kartio** is a web application designed to help business owners manage their brands and loyalty programs efficiently. It allows business owners to create brands and issue loyalty cards to customers. The application provides an intuitive interface for both business owners and their customers.
 
+![alt text](image-1.png)
+
 # Architecture
 
 ## MVC
