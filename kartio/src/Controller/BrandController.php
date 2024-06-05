@@ -27,7 +27,6 @@ class BrandController extends AbstractController
 {
     # This method is responsible for rendering the list of brands
     # that the current user has access to.
-    #[ApiResource]
     #[Route("", name: "app_brands", methods: ["GET"])]
     public function brands(DocumentManager $dm, UserInterface $user): Response
     {
