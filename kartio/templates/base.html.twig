@@ -19,13 +19,13 @@
 			<div class="container mx-auto flex justify-between items-center">
 				<a href="" class="btn btn-ghost normal-case text-xl">Kartio</a>
 				<div>
-					<a href="{{ path('app_home') }}" class="btn btn-ghost btn-sm rounded-btn">Úvod</a>
+					<a href="{{ path('app_homepage') }}" class="btn btn-ghost btn-sm rounded-btn">Úvod</a>
+
+					<a href="{{ path('app_home') }}" class="btn btn-ghost btn-sm rounded-btn">Homepage</a>
 
 					{% if is_granted("ROLE_ADMIN") %}
 						<a href="{{ path('app_brands') }}" class="btn btn-ghost btn-sm rounded-btn">Značky</a>
-					{% endif %}
-
-					{% if is_granted("ROLE_USER") %}
+					{% else %}
 						<a href="{{ path('app_customer_loyalty_cards') }}" class="btn btn-ghost btn-sm rounded-btn">Karty</a>
 					{% endif %}
 
