@@ -70,43 +70,44 @@ To install the Kartio application, follow these steps:
 
 ### Security Configuration
 
-The security configuration involves setting up user providers, firewalls, and access control rules. The `security.yaml` file is configured to handle user authentication, including GitHub OAuth.
+The security configuration involves setting up user providers, firewalls, and access control rules. The `security.yaml` file is configured to handle user authentication.
 
 ```yaml
 security:
+  password_hashers:
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
+
   providers:
-    hwi:
-      id: App\Security\MyEntityUserProvider
+    mongo_provider:
+      mongodb:
+        class: App\Document\User
+        property: email
 
   firewalls:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
-
     main:
-      anonymous: ~
-      oauth:
-        resource_owners:
-          github: "/login/check-github"
-        login_path: /login
-        use_forward: false
-        failure_path: /login
-
-        oauth_user_provider:
-          service: App\Security\MyEntityUserProvider
-
+      lazy: true
+      provider: mongo_provider
+      entry_point: form_login
+      form_login:
+        login_path: app_login
+        check_path: app_login
       logout:
-        path: /logout
-        target: /
-
-      remember_me:
-        secret: "%kernel.secret%"
-        lifetime: 604800 # 1 week in seconds
-        path: /
-        httponly: true
+        path: app_logout
+        target: app_login
 
   access_control:
-    - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-    - { path: ^/login/check-github, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-    - { path: ^/, roles: ROLE_USER }
+    - { path: ^/brands, roles: ROLE_ADMIN }
+    - { path: ^/customer, roles: ROLE_USER }
+
+when@test:
+  security:
+    password_hashers:
+      Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+        algorithm: auto
+        cost: 4 # Lowest possible value for bcrypt
+        time_cost: 3 # Lowest possible value for argon
+        memory_cost: 10 # Lowest possible value for argon
 ```
