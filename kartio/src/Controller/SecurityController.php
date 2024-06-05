@@ -12,8 +12,12 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
+# This controller is responsible for handling security-related actions
+# such as user registration, login, and logout.
+
 class SecurityController extends AbstractController
 {
+    # This method is responsible for rendering the registration form
     #[Route("/register", name: "app_register", methods: ["GET", "POST"])]
     public function register(Request $request, DocumentManager $dm, UserPasswordHasherInterface $passwordHasher): Response
     {
@@ -51,6 +55,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    # This method is responsible for rendering the login form
     #[Route("/login", name: "app_login", methods: ["GET", "POST"])]
     public function login(AuthenticationUtils $authUtils): Response
     {
@@ -67,6 +72,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    # This method is responsible for logging out the user
     #[Route("/logout", name: "app_logout", methods: ["GET", "POST"])]
     public function logout(): void
     {

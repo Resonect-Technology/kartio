@@ -12,19 +12,21 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+# This controller is responsible for handling user-related actions
+# such as viewing loyalty cards.
+
 #[Route("/customer")]
 #[IsGranted("ROLE_USER")]
 class UserController extends AbstractController
 {
-    private $security;
     private $logger;
 
-    public function __construct(SecurityBundleSecurity $security, LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger)
     {
-        $this->security = $security;
         $this->logger = $logger;
     }
 
+    # This method is responsible for rendering the list of loyalty cards
     #[Route("/loyalty-cards", name: "app_customer_loyalty_cards")]
     public function loyaltyCards(DocumentManager $dm, SecurityBundleSecurity $security): Response
     {
@@ -40,6 +42,7 @@ class UserController extends AbstractController
         $brands = $dm->getRepository(Brand::class)->findAll();
         $loyaltyCards = [];
 
+        # Loop through all brands and their loyalty cards
         foreach ($brands as $brand) {
             $this->logger->info("Processing brand: " . $brand->getName());
             foreach ($brand->getLoyaltyCards() as $card) {

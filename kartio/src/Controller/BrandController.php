@@ -16,10 +16,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\ConstraintViolation;
 
+# This controller is responsible for handling brand-related actions
+# such as creating a new brand, adding a loyalty card to a brand,
+# removing a loyalty card from a brand, and inviting a user to a brand.
+
 #[Route("/brands")]
 #[IsGranted("ROLE_ADMIN")]
 class BrandController extends AbstractController
 {
+    # This method is responsible for rendering the list of brands
+    # that the current user has access to.
     #[Route("", name: "app_brands", methods: ["GET"])]
     public function brands(DocumentManager $dm, UserInterface $user): Response
     {
@@ -47,6 +53,7 @@ class BrandController extends AbstractController
         ]);
     }
 
+    # This method is responsible for rendering the details of a brand
     #[Route("/brand/{id}", name: "app_brand", methods: ["GET"])]
     public function brand(DocumentManager $dm, string $id, UserInterface $user): Response
     {
@@ -65,6 +72,7 @@ class BrandController extends AbstractController
         ]);
     }
 
+    # This method is responsible for creating a new brand
     #[Route("/new", name: "app_new_brand", methods: ["GET", "POST"])]
     public function newBrand(Request $request, DocumentManager $dm, UserInterface $user): Response
     {
@@ -97,6 +105,7 @@ class BrandController extends AbstractController
         ]);
     }
 
+    # This method is responsible for adding a loyalty card to a brand
     #[Route("/brand/{id}/add-card", name: "app_add_card", methods: ["GET", "POST"])]
     public function addLoyaltyCard(Brand $brand, Request $request, DocumentManager $dm): Response
     {
@@ -133,6 +142,7 @@ class BrandController extends AbstractController
         ]);
     }
 
+    # This method is responsible for removing a loyalty card from a brand
     #[Route("/brand/{id}/remove-card", name: "app_remove_card", methods: ["POST"])]
     public function removeLoyaltyCard(Brand $brand, Request $request, DocumentManager $dm): Response
     {
@@ -149,6 +159,7 @@ class BrandController extends AbstractController
         return $this->redirectToRoute("app_brand", ["id" => $brand->getId()]);
     }
 
+    # This method is responsible for inviting a user to a brand
     #[Route("/brand/{id}/invite", name: "app_brand_invite", methods: ["GET", "POST"])]
     public function invite(UserInterface $user, Brand $brand, Request $request, DocumentManager $dm): Response
     {
