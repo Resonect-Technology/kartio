@@ -1,18 +1,4 @@
 {
-    "api-platform/core": {
-        "version": "3.3",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "3.3",
-            "ref": "74b45ac570c57eb1fbe56c984091a9ff87e18bab"
-        },
-        "files": [
-            "config/packages/api_platform.yaml",
-            "config/routes/api_platform.yaml",
-            "src/ApiResource/.gitignore"
-        ]
-    },
     "doctrine/doctrine-bundle": {
         "version": "2.12",
         "recipe": {
@@ -51,6 +37,19 @@
         "files": [
             "config/packages/doctrine_mongodb.yaml",
             "src/Document/.gitignore"
+        ]
+    },
+    "hwi/oauth-bundle": {
+        "version": "2.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "2.0",
+            "ref": "20154480d558409ad3eb9de3644817c81fad2268"
+        },
+        "files": [
+            "config/packages/hwi_oauth.yaml",
+            "config/routes/hwi_oauth_routing.yaml"
         ]
     },
     "knpuniversity/oauth2-client-bundle": {

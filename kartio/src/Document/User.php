@@ -8,9 +8,10 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 
 #[ODM\Document(collection: "users")]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, OAuthAwareUserProviderInterface
 {
     #[ODM\Id]
     private $id;

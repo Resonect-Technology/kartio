@@ -21,3 +21,10 @@ services:
       - "../src/DependencyInjection/"
       - "../src/Entity/"
       - "../src/Kernel.php"
+
+  hwi_oauth.user.provider.entity:
+    class: HWI\Bundle\OAuthBundle\Security\Core\User\EntityUserProvider
+    arguments:
+      $class: App\Document\User
+      $properties:
+        "github": "github"
