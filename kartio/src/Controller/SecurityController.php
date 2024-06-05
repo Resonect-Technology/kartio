@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class SecurityController extends AbstractController
 {
     # This method is responsible for rendering the registration form
-    #[Route("/register", name: "app_register", methods: ["GET", "POST"])]
+    #[Route("/register", name: "app_register")]
     public function register(Request $request, DocumentManager $dm, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
@@ -56,7 +56,7 @@ class SecurityController extends AbstractController
     }
 
     # This method is responsible for rendering the login form
-    #[Route("/login", name: "app_login", methods: ["GET", "POST"])]
+    #[Route("/login", name: "app_login")]
     public function login(AuthenticationUtils $authUtils): Response
     {
         $error = $authUtils->getLastAuthenticationError();
@@ -73,7 +73,7 @@ class SecurityController extends AbstractController
     }
 
     # This method is responsible for logging out the user
-    #[Route("/logout", name: "app_logout", methods: ["GET", "POST"])]
+    #[Route("/logout", name: "app_logout")]
     public function logout(): void
     {
         throw new \Exception("This should never be reached!");
