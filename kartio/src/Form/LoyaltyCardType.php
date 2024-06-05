@@ -2,20 +2,26 @@
 
 namespace App\Form;
 
-use App\Document\User;
+use App\Document\LoyaltyCard;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class RegistrationType extends AbstractType
+class LoyaltyCardType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add("customerName", TextType::class, [
+                "label" => "Jméno zákazníka",
+                "attr" => ["class" => "grow"],
+                "constraints" => [
+                    new Assert\NotBlank(),
+                ],
+            ])
             ->add("email", EmailType::class, [
                 "label" => "Email",
                 "attr" => ["class" => "grow"],
@@ -24,30 +30,26 @@ class RegistrationType extends AbstractType
                     new Assert\Email(),
                 ],
             ])
-            ->add("password", PasswordType::class, [
-                "label" => "Heslo",
+            ->add("phoneNumber", TextType::class, [
+                "label" => "Telefonní číslo",
                 "attr" => ["class" => "grow"],
                 "constraints" => [
                     new Assert\NotBlank(),
-                    new Assert\Length(["min" => 10]),
                 ],
             ])
-            ->add("role", ChoiceType::class, [
-                "label" => "Role pro registraci",
-                "choices" => [
-                    "Zákazník" => "ROLE_USER",
-                    "Obchodník" => "ROLE_ADMIN",
+            ->add("cardIdentifier", TextType::class, [
+                "label" => "ID Karty",
+                "attr" => ["class" => "grow"],
+                "constraints" => [
+                    new Assert\NotBlank(),
                 ],
-                "expanded" => false,
-                "multiple" => false,
-                "mapped" => false, // This field is not mapped to the User entity
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            "data_class" => User::class,
+            "data_class" => LoyaltyCard::class,
         ]);
     }
 }

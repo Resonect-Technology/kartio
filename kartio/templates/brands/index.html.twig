@@ -20,6 +20,10 @@
 						<h2 class="card-title">{{ brand.name }}</h2>
 						<p>Počet zákaznických karet:
 							{{ brand.loyaltyCards|length }}</p>
+						<p class="mb-6">
+							Počet administrátorů:
+							{{ brandsAdminCount[brand.id] }}
+						</p>
 						<div class="card-actions justify-end">
 							<a href="{{ path('app_brand', {'id': brand.id}) }}">
 								<button class="btn btn-primary">Zobrazit</button>
@@ -28,7 +32,7 @@
 					</div>
 				</div>
 			{% else %}
-				<p>No brands found.</p>
+				<p>Nebyly nalezeny žádné značky.</p>
 			{% endfor %}
 		</div>
 	</div>

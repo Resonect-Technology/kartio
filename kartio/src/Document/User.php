@@ -2,9 +2,12 @@
 
 namespace App\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ODM\Document(collection: "users")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -13,13 +16,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $id;
 
     #[ODM\Field(type: "string")]
-    private $email;
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    private string $email;
 
     #[ODM\Field(type: "string")]
-    private $password;
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 10, max: 200)]
+    private string $password;
 
     #[ODM\Field(type: "collection")]
     private $roles = [];
+
+    #[ODM\ReferenceMany(targetDocument: Brand::class, mappedBy: "users")]
+    private Collection $brands;
+
+    public function __construct()
+    {
+        $this->brands = new ArrayCollection();
+    }
 
     public function getId(): ?string
     {
@@ -37,21 +52,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return $this->email;
     }
 
-    /**
-     * @see UserInterface
-     *
-     * @return list<string>
-     */
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -61,9 +66,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
-    /**
-     * @param list<string> $roles
-     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
@@ -71,9 +73,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): string
     {
         return $this->password;
@@ -86,12 +85,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getBrands(): Collection
+    {
+        return $this->brands;
+    }
+
+    public function addBrand(Brand $brand): self
+    {
+        if (!$this->brands->contains($brand)) {
+            $this->brands->add($brand);
+            $brand->addUser($this);
+        }
+        return $this;
+    }
+
+    public function removeBrand(Brand $brand): self
+    {
+        if ($this->brands->removeElement($brand)) {
+            $brand->removeUser($this);
+        }
+        return $this;
     }
 }

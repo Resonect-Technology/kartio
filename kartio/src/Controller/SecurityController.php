@@ -12,9 +12,13 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
+# This controller is responsible for handling security-related actions
+# such as user registration, login, and logout.
+
 class SecurityController extends AbstractController
 {
-    #[Route("/register", name: "app_register")]
+    # This method is responsible for rendering the registration form
+    #[Route("/register", name: "app_register", methods: ["GET", "POST"])]
     public function register(Request $request, DocumentManager $dm, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
@@ -23,13 +27,26 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Hash the password
             $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
-
             $user->setPassword($hashedPassword);
 
+            // Ensure email is set from form data
+            $email = $form->get("email")->getData();
+            $user->setEmail($email);
+
+            // Assign roles based on the select value
+            $role = $form->get("role")->getData();
+            $user->setRoles([$role]);
+
+            // Persist the user to the database
             $dm->persist($user);
             $dm->flush();
 
+            // Add a flash message for successful registration
+            $this->addFlash("success", "Registrace byla úspěšná.");
+
+            // Redirect to the login page
             return $this->redirectToRoute("app_login");
         }
 
@@ -38,12 +55,16 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route("/login", name: "app_login")]
+    # This method is responsible for rendering the login form
+    #[Route("/login", name: "app_login", methods: ["GET", "POST"])]
     public function login(AuthenticationUtils $authUtils): Response
     {
         $error = $authUtils->getLastAuthenticationError();
-
         $lastUsername = $authUtils->getLastUsername();
+
+        if ($error) {
+            $this->addFlash("error", "Přihlášení selhalo, prosím zkuste to znovu.");
+        }
 
         return $this->render("security/login.html.twig", [
             "last_username" => $lastUsername,
@@ -51,7 +72,8 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route("/logout", name: "app_logout")]
+    # This method is responsible for logging out the user
+    #[Route("/logout", name: "app_logout", methods: ["GET", "POST"])]
     public function logout(): void
     {
         throw new \Exception("This should never be reached!");
