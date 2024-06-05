@@ -3,6 +3,10 @@
 - This app provides a simple way for business to issue loayalty cards for their customers.
 - It was created as a university project for web appliactions course.
 
+![alt text](image.png)
+
+**Kartio** is a web application designed to help business owners manage their brands and loyalty programs efficiently. It allows business owners to create brands and issue loyalty cards to customers. The application provides an intuitive interface for both business owners and their customers.
+
 # Architecture
 
 ## MVC
@@ -25,12 +29,6 @@
 # Development
 
 - Secrets are only stored in `.env.local`.
-
-# Kartio Application Development and Functionalities
-
-## Overview
-
-**Kartio** is a web application designed to help business owners manage their brands and loyalty programs efficiently. It allows business owners to create brands and issue loyalty cards to customers. The application provides an intuitive interface for both business owners and their customers.
 
 ## Installation
 
