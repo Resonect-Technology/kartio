@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 
 #[ODM\Document(collection: "users")]
-class User implements UserInterface, PasswordAuthenticatedUserInterface, OAuthAwareUserProviderInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ODM\Id]
     private $id;

@@ -26,12 +26,89 @@
 
 - Secrets are only stored in `.env.local`.
 
-# Security
+# Kartio Application Development and Functionalities
 
-## Forms
+## Overview
 
-Using Symfony's Form Builder offers several advantages, including better separation of concerns by decoupling form logic from business logic, automatic validation integration ensuring data integrity, ease of form creation and management with a fluent interface, built-in security features like CSRF protection, seamless Twig integration for rendering and customizing form layouts, support for localization and translation, the ability to handle complex and dynamic forms, and extensibility through custom form types and events. These features collectively enhance the maintainability, reusability, and robustness of form handling in Symfony applications.
+**Kartio** is a web application designed to help business owners manage their brands and loyalty programs efficiently. It allows business owners to create brands and issue loyalty cards to customers. The application provides an intuitive interface for both business owners and their customers.
 
-## SQL Injection
+## Installation
 
-Doctrine ODM takes care of preventing injection attacks in MongoDB by using parameterized queries and escaping data, ensuring that user inputs are never directly interpolated into query strings. It abstracts the complexities of database interactions, making it easier for developers to write secure code. Additionally, when used with Symfony's validation and form handling components, it ensures that only sanitized and validated data is persisted, providing robust protection against injection and other security vulnerabilities.
+To install the Kartio application, follow these steps:
+
+1. **Clone the Repository**:
+
+   ```bash
+   git clone https://github.com/your-repo/kartio.git
+   cd kartio
+   ```
+
+2. **Install Dependencies**:
+
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Set Up Environment Variables**:
+
+   ```bash
+   cp .env.example .env
+   # Edit the .env file to add your database and OAuth credentials
+   ```
+
+4. **Run Migrations**:
+
+   ```bash
+   php bin/console doctrine:migrations:migrate
+   ```
+
+5. **Start the Development Server**:
+   ```bash
+   symfony server:start
+   ```
+
+## Configuration
+
+### Security Configuration
+
+The security configuration involves setting up user providers, firewalls, and access control rules. The `security.yaml` file is configured to handle user authentication, including GitHub OAuth.
+
+```yaml
+security:
+  providers:
+    hwi:
+      id: App\Security\MyEntityUserProvider
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+
+    main:
+      anonymous: ~
+      oauth:
+        resource_owners:
+          github: "/login/check-github"
+        login_path: /login
+        use_forward: false
+        failure_path: /login
+
+        oauth_user_provider:
+          service: App\Security\MyEntityUserProvider
+
+      logout:
+        path: /logout
+        target: /
+
+      remember_me:
+        secret: "%kernel.secret%"
+        lifetime: 604800 # 1 week in seconds
+        path: /
+        httponly: true
+
+  access_control:
+    - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/login/check-github, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/, roles: ROLE_USER }
+```
