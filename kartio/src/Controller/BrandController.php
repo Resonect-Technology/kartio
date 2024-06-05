@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\ConstraintViolation;
+use ApiPlatform\Metadata\ApiResource;
 
 # This controller is responsible for handling brand-related actions
 # such as creating a new brand, adding a loyalty card to a brand,
@@ -26,6 +27,7 @@ class BrandController extends AbstractController
 {
     # This method is responsible for rendering the list of brands
     # that the current user has access to.
+    #[ApiResource]
     #[Route("", name: "app_brands", methods: ["GET"])]
     public function brands(DocumentManager $dm, UserInterface $user): Response
     {
