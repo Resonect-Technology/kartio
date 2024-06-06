@@ -14,7 +14,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\Builder\BuilderInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 # This controller is responsible for handling user-related actions
