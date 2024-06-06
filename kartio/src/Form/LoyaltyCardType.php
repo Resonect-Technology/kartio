@@ -40,6 +40,7 @@ class LoyaltyCardType extends AbstractType
             ->add("cardIdentifier", TextType::class, [
                 "label" => "ID Karty",
                 "attr" => ["class" => "grow"],
+                "required" => false,
                 "constraints" => [
                     new Assert\NotBlank(),
                 ],

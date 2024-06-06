@@ -90,4 +90,14 @@ class Brand
         }
         return $this;
     }
+
+    public function hasDuplicateCardIdentifier(string $cardIdentifier): bool
+    {
+        foreach ($this->loyaltyCards as $card) {
+            if ($card->getCardIdentifier() === $cardIdentifier) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -33,12 +33,12 @@ class LoyaltyCard
     #[ODM\ReferenceOne(targetDocument: Brand::class)]
     private ?Brand $brand = null;
 
-    public function __construct(string $customerName, string $email, string $phoneNumber, string $cardIdentifier)
+    public function __construct(string $customerName, string $email, string $phoneNumber, ?string $cardIdentifier = null)
     {
         $this->customerName = $customerName;
         $this->email = $email;
         $this->phoneNumber = $phoneNumber;
-        $this->cardIdentifier = $cardIdentifier;
+        $this->cardIdentifier = $cardIdentifier ?: $this->generateCardIdentifier();
     }
 
     public function getCustomerName(): string
@@ -89,5 +89,10 @@ class LoyaltyCard
     public function setBrand(Brand $brand): void
     {
         $this->brand = $brand;
+    }
+
+    private function generateCardIdentifier(): string
+    {
+        return bin2hex(random_bytes(8));
     }
 }

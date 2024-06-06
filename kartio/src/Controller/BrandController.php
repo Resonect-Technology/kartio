@@ -11,11 +11,11 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\ConstraintViolation;
-use ApiPlatform\Metadata\ApiResource;
 
 # This controller is responsible for handling brand-related actions
 # such as creating a new brand, adding a loyalty card to a brand,
@@ -83,14 +83,21 @@ class BrandController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $brand->setName($form->get("name")->getData());
-                $brand->addUser($user); // Associate the brand with the current user
+                // Check if a brand with the same name already exists
+                $existingBrand = $dm->getRepository(Brand::class)->findOneBy(['name' => $form->get("name")->getData()]);
 
-                $dm->persist($brand);
-                $dm->flush();
+                if ($existingBrand) {
+                    $this->addFlash("error", "Taková značka již existuje.");
+                } else {
+                    $brand->setName($form->get("name")->getData());
+                    $brand->addUser($user); // Associate the brand with the current user
 
-                $this->addFlash("success", "Brand created successfully.");
-                return $this->redirectToRoute("app_brands");
+                    $dm->persist($brand);
+                    $dm->flush();
+
+                    $this->addFlash("success", "Značka byla vytvořena.");
+                    return $this->redirectToRoute("app_brands");
+                }
             } else {
                 // Collect validation errors
                 $errors = $form->getErrors(true, true);
@@ -108,25 +115,46 @@ class BrandController extends AbstractController
 
     # This method is responsible for adding a loyalty card to a brand
     #[Route("/brand/{id}/add-card", name: "app_add_card", methods: ["GET", "POST"])]
-    public function addLoyaltyCard(Brand $brand, Request $request, DocumentManager $dm): Response
+    public function addLoyaltyCard(Brand $brand, Request $request, DocumentManager $dm, UserPasswordHasher $passwordHasher): Response
     {
-        $loyaltyCard = new LoyaltyCard("", "", "", "");
+        $loyaltyCard = new LoyaltyCard("", "", "", null);
 
         $form = $this->createForm(LoyaltyCardType::class, $loyaltyCard);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                try {
-                    $loyaltyCard->setBrand($brand); // Set the brand for the loyalty card
-                    $brand->addLoyaltyCard($loyaltyCard);
-                    $dm->flush();
-                    $this->addFlash("success", "Karta byla přidána.");
-                } catch (\Exception $e) {
-                    $this->addFlash("error", $e->getMessage());
-                }
+                if ($brand->hasDuplicateCardIdentifier($loyaltyCard->getCardIdentifier())) {
+                    $this->addFlash("error", "Karta s tímto identifikátorem již existuje.");
+                } else {
+                    try {
+                        $email = $loyaltyCard->getEmail();
+                        $user = $dm->getRepository(User::class)->findOneBy(['email' => $email]);
 
-                return $this->redirectToRoute("app_brand", ["id" => $brand->getId()]);
+                        if (!$user) {
+                            // Create new user if not exists
+                            $user = new User();
+                            $user->setEmail($email);
+
+                            $randomPassword = $this->generateRandomPassword();
+                            $hashedPassword = $passwordHasher->hashPassword($user, $randomPassword);
+                            $user->setPassword($hashedPassword);
+
+                            $dm->persist($user);
+
+                            $this->addFlash("success", "Byl vytvořen nový uživatel s emailem: $email a heslem: $randomPassword");
+                        }
+
+                        $loyaltyCard->setBrand($brand); // Set the brand for the loyalty card
+                        $brand->addLoyaltyCard($loyaltyCard);
+                        $dm->flush();
+                        $this->addFlash("success", "Karta byla přidána.");
+
+                        return $this->redirectToRoute("app_brand", ["id" => $brand->getId()]);
+                    } catch (\Exception $e) {
+                        $this->addFlash("error", $e->getMessage());
+                    }
+                }
             } else {
                 // Collect validation errors
                 $errors = $form->getErrors(true, true);
@@ -186,5 +214,11 @@ class BrandController extends AbstractController
         return $this->render("brands/invite.html.twig", [
             "brand" => $brand,
         ]);
+    }
+
+
+    private function generateRandomPassword($length = 12): string
+    {
+        return bin2hex(random_bytes($length / 2));
     }
 }

@@ -27,18 +27,18 @@
 							<td>{{ card.email }}</td>
 							<td>{{ card.phoneNumber }}</td>
 							<td>{{ card.cardIdentifier }}</td>
+							<td>
+								<a class="btn btn-secondary" href="{{ path('app_customer_loyalty_card_detail', {id: card.cardIdentifier}) }}">Detail karty</a>
+							</td>
 						</tr>
-					{% else %}
-						<tr>
-							<td colspan="6">Nebyly nalezeny žádné karty.</td>
-						</tr>
-					{% endfor %}
+					</a>
 				</tbody>
-			</table>
-		</div>
-
-		<div class="flex justify-end">
-			<a href="{{ path('app_home') }}" class="btn btn-secondary">Zpět</a>
-		</div>
-	</div>
-{% endblock %}
+			</tr>
+		{% else %}
+			<tr>
+				<td colspan="6">Nebyly nalezeny žádné karty.</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table></div><div class="flex justify-end">
+<a href="{{ path('app_home') }}" class="btn btn-primary">Zpět</a></div></div>{% endblock %}
