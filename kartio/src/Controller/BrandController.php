@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -134,7 +135,7 @@ class BrandController extends AbstractController
 
     # This method is responsible for adding a loyalty card to a brand
     #[Route("/brand/{id}/add-card", name: "app_add_card", methods: ["GET", "POST"])]
-    public function addLoyaltyCard(Brand $brand, Request $request, DocumentManager $dm, UserPasswordHasher $passwordHasher): Response
+    public function addLoyaltyCard(Brand $brand, Request $request, DocumentManager $dm, UserPasswordHasherInterface $passwordHasher): Response
     {
         $loyaltyCard = new LoyaltyCard("", "", "", null);
 
