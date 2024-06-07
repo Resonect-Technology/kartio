@@ -21,6 +21,9 @@ class Brand
     #[ODM\ReferenceMany(targetDocument: User::class, inversedBy: "brands")]
     private Collection $users;
 
+    #[ODM\Field(type: "string", nullable: true)]
+    private ?string $picturePath = null;
+
     public function __construct(string $name)
     {
         $this->name = $name;
@@ -99,5 +102,15 @@ class Brand
             }
         }
         return false;
+    }
+
+    public function getPicturePath(): ?string
+    {
+        return $this->picturePath;
+    }
+
+    public function setPicturePath(?string $picturePath): void
+    {
+        $this->picturePath = $picturePath;
     }
 }

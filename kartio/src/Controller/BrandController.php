@@ -9,6 +9,7 @@ use App\Form\BrandType;
 use App\Form\LoyaltyCardType;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
@@ -84,13 +85,31 @@ class BrandController extends AbstractController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 // Check if a brand with the same name already exists
-                $existingBrand = $dm->getRepository(Brand::class)->findOneBy(['name' => $form->get("name")->getData()]);
+                $existingBrand = $dm->getRepository(Brand::class)->findOneBy(["name" => $form->get("name")->getData()]);
 
                 if ($existingBrand) {
                     $this->addFlash("error", "Taková značka již existuje.");
                 } else {
                     $brand->setName($form->get("name")->getData());
                     $brand->addUser($user); // Associate the brand with the current user
+
+                    $pictureFile = $form->get("picture")->getData();
+                    if ($pictureFile) {
+                        $originalFilename = pathinfo($pictureFile->getClientOriginalName(), PATHINFO_FILENAME);
+                        $safeFilename = $this->sanitizeFilename($originalFilename);
+                        $newFilename = $safeFilename . "-" . uniqid() . "." . $pictureFile->guessExtension();
+
+                        // Move the file to the directory where pictures are stored
+                        try {
+                            $pictureFile->move(
+                                $this->getParameter("pictures_directory"),
+                                $newFilename
+                            );
+                            $brand->setPicturePath($newFilename);
+                        } catch (FileException $e) {
+                            $this->addFlash("error", "Došlo k chybě při nahrávání souboru.");
+                        }
+                    }
 
                     $dm->persist($brand);
                     $dm->flush();
@@ -129,7 +148,7 @@ class BrandController extends AbstractController
                 } else {
                     try {
                         $email = $loyaltyCard->getEmail();
-                        $user = $dm->getRepository(User::class)->findOneBy(['email' => $email]);
+                        $user = $dm->getRepository(User::class)->findOneBy(["email" => $email]);
 
                         if (!$user) {
                             // Create new user if not exists
@@ -220,5 +239,13 @@ class BrandController extends AbstractController
     private function generateRandomPassword($length = 12): string
     {
         return bin2hex(random_bytes($length / 2));
+    }
+
+    function sanitizeFilename(string $filename): string
+    {
+        $filename = preg_replace("/[^A-Za-z0-9]/", "_", $filename);
+        $filename = strtolower($filename);
+
+        return $filename;
     }
 }
