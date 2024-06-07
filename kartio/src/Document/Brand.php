@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-#[ODM\Document()]
+#[ODM\Document(collection: "new_brand", indexes: [new ODM\Index(keys: ["name" => "asc"], options: ["unique" => true])])]
 class Brand
 {
     #[ODM\Id()]
@@ -15,7 +15,7 @@ class Brand
     #[ODM\Field(type: "string")]
     private string $name;
 
-    #[ODM\EmbedMany(targetDocument: LoyaltyCard::class)]
+    #[ODM\ReferenceMany(targetDocument: LoyaltyCard::class, mappedBy: "brand")]
     private Collection $loyaltyCards;
 
     #[ODM\ReferenceMany(targetDocument: User::class, inversedBy: "brands")]

@@ -12,23 +12,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\ConstraintViolation;
 
-# This controller is responsible for handling brand-related actions
-# such as creating a new brand, adding a loyalty card to a brand,
-# removing a loyalty card from a brand, and inviting a user to a brand.
-
 #[Route("/brands")]
 #[IsGranted("ROLE_ADMIN")]
 class BrandController extends AbstractController
 {
-    # This method is responsible for rendering the list of brands
-    # that the current user has access to.
     #[Route("", name: "app_brands", methods: ["GET"])]
     public function brands(DocumentManager $dm, UserInterface $user): Response
     {
@@ -56,7 +49,6 @@ class BrandController extends AbstractController
         ]);
     }
 
-    # This method is responsible for rendering the details of a brand
     #[Route("/brand/{id}", name: "app_brand", methods: ["GET"])]
     public function brand(DocumentManager $dm, string $id, UserInterface $user): Response
     {
@@ -75,7 +67,6 @@ class BrandController extends AbstractController
         ]);
     }
 
-    # This method is responsible for creating a new brand
     #[Route("/new", name: "app_new_brand", methods: ["GET", "POST"])]
     public function newBrand(Request $request, DocumentManager $dm, UserInterface $user): Response
     {
@@ -85,14 +76,13 @@ class BrandController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                // Check if a brand with the same name already exists
                 $existingBrand = $dm->getRepository(Brand::class)->findOneBy(["name" => $form->get("name")->getData()]);
 
                 if ($existingBrand) {
                     $this->addFlash("error", "Taková značka již existuje.");
                 } else {
                     $brand->setName($form->get("name")->getData());
-                    $brand->addUser($user); // Associate the brand with the current user
+                    $brand->addUser($user);
 
                     $pictureFile = $form->get("picture")->getData();
                     if ($pictureFile) {
@@ -100,7 +90,6 @@ class BrandController extends AbstractController
                         $safeFilename = $this->sanitizeFilename($originalFilename);
                         $newFilename = $safeFilename . "-" . uniqid() . "." . $pictureFile->guessExtension();
 
-                        // Move the file to the directory where pictures are stored
                         try {
                             $pictureFile->move(
                                 $this->getParameter("pictures_directory"),
@@ -119,9 +108,7 @@ class BrandController extends AbstractController
                     return $this->redirectToRoute("app_brands");
                 }
             } else {
-                // Collect validation errors
                 $errors = $form->getErrors(true, true);
-                /** @var ConstraintViolation $error */
                 foreach ($errors as $error) {
                     $this->addFlash("error", $error->getMessage());
                 }
@@ -133,7 +120,6 @@ class BrandController extends AbstractController
         ]);
     }
 
-    # This method is responsible for adding a loyalty card to a brand
     #[Route("/brand/{id}/add-card", name: "app_add_card", methods: ["GET", "POST"])]
     public function addLoyaltyCard(Brand $brand, Request $request, DocumentManager $dm, UserPasswordHasherInterface $passwordHasher): Response
     {
@@ -144,7 +130,9 @@ class BrandController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                if ($brand->hasDuplicateCardIdentifier($loyaltyCard->getCardIdentifier())) {
+                $existingCard = $dm->getRepository(LoyaltyCard::class)->findOneBy(["cardIdentifier" => $loyaltyCard->getCardIdentifier()]);
+
+                if ($existingCard) {
                     $this->addFlash("error", "Karta s tímto identifikátorem již existuje.");
                 } else {
                     try {
@@ -152,7 +140,6 @@ class BrandController extends AbstractController
                         $user = $dm->getRepository(User::class)->findOneBy(["email" => $email]);
 
                         if (!$user) {
-                            // Create new user if not exists
                             $user = new User();
                             $user->setEmail($email);
 
@@ -165,8 +152,8 @@ class BrandController extends AbstractController
                             $this->addFlash("success", "Byl vytvořen nový uživatel s emailem: $email a heslem: $randomPassword");
                         }
 
-                        $loyaltyCard->setBrand($brand); // Set the brand for the loyalty card
-                        $brand->addLoyaltyCard($loyaltyCard);
+                        $loyaltyCard->setBrand($brand);
+                        $dm->persist($loyaltyCard);
                         $dm->flush();
                         $this->addFlash("success", "Karta byla přidána.");
 
@@ -176,9 +163,7 @@ class BrandController extends AbstractController
                     }
                 }
             } else {
-                // Collect validation errors
                 $errors = $form->getErrors(true, true);
-                /** @var ConstraintViolation $error */
                 foreach ($errors as $error) {
                     $this->addFlash("error", $error->getMessage());
                 }
@@ -191,16 +176,20 @@ class BrandController extends AbstractController
         ]);
     }
 
-    # This method is responsible for removing a loyalty card from a brand
     #[Route("/brand/{id}/remove-card", name: "app_remove_card", methods: ["POST"])]
     public function removeLoyaltyCard(Brand $brand, Request $request, DocumentManager $dm): Response
     {
-        $email = $request->request->get("email");
+        $cardIdentifier = $request->request->get("cardIdentifier");
 
         try {
-            $brand->removeLoyaltyCard($email);
-            $dm->flush();
-            $this->addFlash("success", "Karta byla odebrána.");
+            $card = $dm->getRepository(LoyaltyCard::class)->findOneBy(["cardIdentifier" => $cardIdentifier]);
+            if ($card) {
+                $dm->remove($card);
+                $dm->flush();
+                $this->addFlash("success", "Karta byla odebrána.");
+            } else {
+                $this->addFlash("error", "Karta nebyla nalezena.");
+            }
         } catch (\Exception $e) {
             $this->addFlash("error", $e->getMessage());
         }
@@ -208,7 +197,6 @@ class BrandController extends AbstractController
         return $this->redirectToRoute("app_brand", ["id" => $brand->getId()]);
     }
 
-    # This method is responsible for inviting a user to a brand
     #[Route("/brand/{id}/invite", name: "app_brand_invite", methods: ["GET", "POST"])]
     public function invite(UserInterface $user, Brand $brand, Request $request, DocumentManager $dm): Response
     {
@@ -236,17 +224,14 @@ class BrandController extends AbstractController
         ]);
     }
 
-
     private function generateRandomPassword($length = 12): string
     {
         return bin2hex(random_bytes($length / 2));
     }
 
-    function sanitizeFilename(string $filename): string
+    private function sanitizeFilename(string $filename): string
     {
         $filename = preg_replace("/[^A-Za-z0-9]/", "_", $filename);
-        $filename = strtolower($filename);
-
-        return $filename;
+        return strtolower($filename);
     }
 }
